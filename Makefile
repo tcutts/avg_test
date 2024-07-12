@@ -2,7 +2,12 @@ PROGS=create_data stats stats_mmap
 DATA=/tmp/data.bin
 RDATA=/tmp/data.Rdata
 
-all: $(PROGS)
+all: .venv $(PROGS)
+
+.venv: requirements.txt
+	rm -rf .venv
+	python3 -m venv .venv
+	pip3 install -r requirements.txt
 
 $(DATA): create_data
 	./create_data
@@ -19,9 +24,8 @@ stats: stats.c
 stats_mmap: stats_mmap.c
 	$(CC) $(CFLAGS) -o $@ $<
 
-test: $(DATA) $(RDATA)
-	/usr/bin/time -p ./stats
-	/usr/bin/time -p ./stats_mmap
+test: .venv $(DATA) $(RDATA)
+	./runtests.sh
 
 clean:
 	rm -f core *~ $(PROGS)
